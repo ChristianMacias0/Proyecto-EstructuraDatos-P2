@@ -1,0 +1,13 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\JORDAN\\Downloads\\grafos (1)\\grafos\\lib\\gs-algo-2.0.jar",
+        "c:\\Users\\JORDAN\\Downloads\\grafos (1)\\grafos\\lib\\gs-core-2.0.jar",
+        "c:\\Users\\JORDAN\\Downloads\\grafos (1)\\grafos\\lib\\gs-ui-swing-2.0.jar"
+    ]
+    <dependency>
+    <groupId>org.graphstream</groupId>
+    <artifactId>gs-core</artifactId>
+    <version>2.0</version>
+    </dependency>
+}
