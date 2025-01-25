@@ -64,6 +64,9 @@ public class RobotSimulation1 {
 
         // Conectar las esquinas de los mismos obstáculos
         connectObstacleCorners();
+
+        // Conectar nodos visibles entre sí
+        connectVisibleNodes();
     }
 
     private void connectObstacleCorners() {
@@ -76,6 +79,74 @@ public class RobotSimulation1 {
             }
             obstacleCounter++;
         }
+    }
+
+    private void connectVisibleNodes() {
+        List<String> nodes = new ArrayList<>();
+
+        // Agregar todos los nodos de los obstáculos
+        int obstacleCounter = 1;
+        for (List<Point> rectangle : obstacles) {
+            for (int i = 0; i < rectangle.size(); i++) {
+                nodes.add("Obstacle" + obstacleCounter + "_" + i);
+            }
+            obstacleCounter++;
+        }
+
+        // Conectar los nodos visibles entre sí
+        for (int i = 0; i < nodes.size(); i++) {
+            for (int j = i + 1; j < nodes.size(); j++) {
+                String nodeA = nodes.get(i);
+                String nodeB = nodes.get(j);
+                if (isVisible(nodeA, nodeB)) {
+                    grafo.agregarArco(nodeA, nodeB);
+                }
+            }
+        }
+    }
+
+    private boolean isVisible(String nodeA, String nodeB) {
+        Point posA = getNodePosition(nodeA);
+        Point posB = getNodePosition(nodeB);
+
+        // Verificar si la línea entre posA y posB intersecta algún lado de los obstáculos
+        for (List<Point> rectangle : obstacles) {
+            for (int i = 0; i < rectangle.size(); i++) {
+                Point p1 = rectangle.get(i);
+                Point p2 = rectangle.get((i + 1) % rectangle.size());
+                if (linesIntersect(posA, posB, p1, p2)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean linesIntersect(Point a1, Point a2, Point b1, Point b2) {
+        double det = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
+        if (det == 0) return false; // Líneas paralelas
+
+        double t = ((b1.x - a1.x) * (b2.y - b1.y) - (b1.y - a1.y) * (b2.x - b1.x)) / det;
+        double u = ((b1.x - a1.x) * (a2.y - a1.y) - (b1.y - a1.y) * (a2.x - a1.x)) / det;
+
+        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+    }
+
+    private Point getNodePosition(String node) {
+        if (node.equals("Robot")) return robotPosition;
+        if (node.equals("Goal")) return goalPosition;
+
+        int obstacleCounter = 1;
+        for (List<Point> rectangle : obstacles) {
+            for (int i = 0; i < rectangle.size(); i++) {
+                String nodeId = "Obstacle" + obstacleCounter + "_" + i;
+                if (nodeId.equals(node)) {
+                    return rectangle.get(i);
+                }
+            }
+            obstacleCounter++;
+        }
+        return null;
     }
 
     public void display() {
