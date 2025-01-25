@@ -1,5 +1,7 @@
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
+import org.graphstream.ui.view.Viewer;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -160,18 +162,21 @@ System.out.println("Aristas: " + grafo.getGraphstream().getEdgeCount());
         int y = (int) (original.y * scaleFactor) + offsetY;
         return new Point(x, y);
     }
-
+    
     private Point getNodePosition(String node) {
-        double scaleFactor = 0.5; // Factor para reducir aún más las posiciones
-        int offsetX = 100; // Desplazamiento horizontal
-        int offsetY = 100; // Desplazamiento vertical
-
+        double scaleFactor = 0.4; // Factor de escala ajustado
+        int offsetX = 100;       // Ajuste horizontal
+        int offsetY = 100;       // Ajuste vertical
+    
+        // Escalar posición del robot
         if (node.equals("Robot")) 
             return scalePosition(robotPosition, scaleFactor, offsetX, offsetY);
+    
+        // Escalar posición de la meta
         if (node.equals("Goal")) 
             return scalePosition(goalPosition, scaleFactor, offsetX, offsetY);
-
-        // Obtener posición de las esquinas de obstáculos
+    
+        // Escalar posiciones de los obstáculos
         for (int i = 0; i < obstacles.size(); i++) {
             List<Point> rectangle = obstacles.get(i);
             for (int j = 0; j < rectangle.size(); j++) {
@@ -181,9 +186,8 @@ System.out.println("Aristas: " + grafo.getGraphstream().getEdgeCount());
                 }
             }
         }
-        return null;
+        return null; // Devuelve nulo si no se encuentra el nodo
     }
-
     private boolean linesIntersect(Point a1, Point a2, Point b1, Point b2) {
         double det = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
         if (det == 0) return false; // Líneas paralelas
@@ -194,19 +198,31 @@ System.out.println("Aristas: " + grafo.getGraphstream().getEdgeCount());
         return t >= 0 && t <= 1 && u >= 0 && u <= 1;
     }
 
-    public void display() {
-        Graph graphstreamGraph = grafo.getGraphstream();
+   public void display() {
+    Graph graphstreamGraph = grafo.getGraphstream();
 
-        // Cargar el archivo CSS
-        String cssFilePath = "style.css"; // Asegúrate de que esta ruta sea correcta
-        graphstreamGraph.setAttribute("ui.stylesheet", "url('" + cssFilePath + "')");
+    // Cargar el archivo CSS
+    String cssFilePath = "style.css"; // Asegúrate de que esta ruta sea correcta
+    graphstreamGraph.setAttribute("ui.stylesheet", "url('" + cssFilePath + "')");
 
-        // Asignar posiciones a los nodos
-        graphstreamGraph.getNode("Robot").setAttribute("xy", getNodePosition("Robot").x, getNodePosition("Robot").y);
-        graphstreamGraph.getNode("Goal").setAttribute("xy", getNodePosition("Goal").x, getNodePosition("Goal").y);
+    // Asignar posiciones escaladas a los nodos
+    graphstreamGraph.getNode("Robot").setAttribute("xy", getNodePosition("Robot").x, getNodePosition("Robot").y);
+    graphstreamGraph.getNode("Goal").setAttribute("xy", getNodePosition("Goal").x, getNodePosition("Goal").y);
 
-        graphstreamGraph.display();
+    for (int i = 0; i < obstacles.size(); i++) {
+        for (int j = 0; j < obstacles.get(i).size(); j++) {
+            String nodeId = "Obstacle" + (i + 1) + "_" + j;
+            Point pos = getNodePosition(nodeId);
+            if (graphstreamGraph.getNode(nodeId) != null) {
+                graphstreamGraph.getNode(nodeId).setAttribute("xy", pos.x, pos.y);
+            }
+        }
     }
+
+    // Mostrar el grafo y ajustar el zoom
+    Viewer viewer = graphstreamGraph.display();
+    viewer.getDefaultView().getCamera().setViewPercent(1.0); // Ajusta el zoom (0.6 = vista más cercana)
+}
 
     public static void main(String[] args) {
         // Ruta del archivo de configuración
