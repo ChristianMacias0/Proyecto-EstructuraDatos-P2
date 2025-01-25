@@ -108,28 +108,67 @@ public class RobotSimulation1 {
     private boolean isVisible(String nodeA, String nodeB) {
         Point posA = getNodePosition(nodeA);
         Point posB = getNodePosition(nodeB);
-
-        // Verificar si la línea entre posA y posB intersecta algún lado de los obstáculos
+    
         for (List<Point> rectangle : obstacles) {
             for (int i = 0; i < rectangle.size(); i++) {
                 Point p1 = rectangle.get(i);
                 Point p2 = rectangle.get((i + 1) % rectangle.size());
+    
                 if (linesIntersect(posA, posB, p1, p2)) {
                     return false;
                 }
             }
         }
+        System.out.println("Nodos visibles: " + nodeA + " y " + nodeB);
         return true;
     }
 
     private boolean linesIntersect(Point a1, Point a2, Point b1, Point b2) {
+        // Verificar si los Bounding Boxes se superponen
+        if (!boundingBoxesIntersect(a1, a2, b1, b2)) {
+            return false;
+        }
+    
+        // Cálculo del determinante para verificar si las líneas son paralelas o colineales
         double det = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
-        if (det == 0) return false; // Líneas paralelas
-
+        if (det == 0) {
+            // Líneas paralelas o colineales
+            return colinearSegmentsOverlap(a1, a2, b1, b2);
+        }
+    
+        // Cálculo de los parámetros t y u
         double t = ((b1.x - a1.x) * (b2.y - b1.y) - (b1.y - a1.y) * (b2.x - b1.x)) / det;
         double u = ((b1.x - a1.x) * (a2.y - a1.y) - (b1.y - a1.y) * (a2.x - a1.x)) / det;
-
+    
+        // Verificar si t y u están dentro de los límites [0, 1]
         return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+    }
+    
+    private boolean colinearSegmentsOverlap(Point a1, Point a2, Point b1, Point b2) {
+        // Verificar si los segmentos son colineales
+        if (!isColinear(a1, a2, b1) || !isColinear(a1, a2, b2)) {
+            return false;
+        }
+    
+        // Verificar si los segmentos se solapan
+        return Math.max(a1.x, a2.x) >= Math.min(b1.x, b2.x) &&
+               Math.max(b1.x, b2.x) >= Math.min(a1.x, a2.x) &&
+               Math.max(a1.y, a2.y) >= Math.min(b1.y, b2.y) &&
+               Math.max(b1.y, b2.y) >= Math.min(a1.y, a2.y);
+    }
+    
+    private boolean isColinear(Point a, Point b, Point c) {
+        // Verificar colinealidad usando el área del triángulo formado por los puntos
+        return (b.x - a.x) * (c.y - a.y) == (c.x - a.x) * (b.y - a.y);
+    }
+
+    private boolean boundingBoxesIntersect(Point a1, Point a2, Point b1, Point b2) {
+        boolean intersect = Math.min(a1.x, a2.x) <= Math.max(b1.x, b2.x) &&
+                            Math.max(a1.x, a2.x) >= Math.min(b1.x, b2.x) &&
+                            Math.min(a1.y, a2.y) <= Math.max(b1.y, b2.y) &&
+                            Math.max(a1.y, a2.y) >= Math.min(b1.y, b2.y);
+    
+        return intersect;
     }
 
     private Point getNodePosition(String node) {
