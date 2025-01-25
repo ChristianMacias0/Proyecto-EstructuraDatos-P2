@@ -1,0 +1,34 @@
+node {
+    fill-color: gray;
+    size: 20px;
+    stroke-mode: plain;
+    stroke-color: black;
+    text-alignment: center;
+    text-color: rgb(0, 0, 0);
+    text-size: 12px;
+}
+
+node#Robot {
+    fill-color: blue;
+    size: 25px;
+}
+
+node#Goal {
+    fill-color: green;
+    size: 25px;
+}
+
+node.obstacleNode {
+    fill-color: orange;
+    size: 15px;
+}
+
+edge {
+    fill-color: black;
+    size: 2px;
+}
+
+edge.obstacleEdge {
+    fill-color: orange;
+    size: 1.5px;
+}
