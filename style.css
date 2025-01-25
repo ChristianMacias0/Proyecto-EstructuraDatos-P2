@@ -29,6 +29,7 @@ edge {
 }
 
 edge.obstacleEdge {
-    fill-color: orange;
-    size: 1.5px;
+    fill-color: red;
+    size: 2px;
+    visibility-mode: normal;
 }
