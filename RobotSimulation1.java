@@ -133,7 +133,12 @@ public class RobotSimulation1 {
         double det = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
         if (det == 0) {
             // Líneas paralelas o colineales
-            return colinearSegmentsOverlap(a1, a2, b1, b2);
+            System.out.println("Líneas paralelas o colineales: " + a1 + "-" + a2 + " y " + b1 + "-" + b2);
+    
+            // Si son colineales, verificar si los segmentos se solapan
+            boolean overlap = colinearSegmentsOverlap(a1, a2, b1, b2);
+            System.out.println("Segmentos colineales se solapan: " + overlap);
+            return overlap;
         }
     
         // Cálculo de los parámetros t y u
@@ -141,7 +146,10 @@ public class RobotSimulation1 {
         double u = ((b1.x - a1.x) * (a2.y - a1.y) - (b1.y - a1.y) * (a2.x - a1.x)) / det;
     
         // Verificar si t y u están dentro de los límites [0, 1]
-        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+        boolean intersects = t >= 0 && t <= 1 && u >= 0 && u <= 1;
+    
+        System.out.println("Intersección entre " + a1 + "-" + a2 + " y " + b1 + "-" + b2 + ": " + intersects);
+        return intersects;
     }
     
     private boolean colinearSegmentsOverlap(Point a1, Point a2, Point b1, Point b2) {
@@ -168,6 +176,9 @@ public class RobotSimulation1 {
                             Math.min(a1.y, a2.y) <= Math.max(b1.y, b2.y) &&
                             Math.max(a1.y, a2.y) >= Math.min(b1.y, b2.y);
     
+        System.out.println("Bounding Box Intersect: " + intersect + 
+                           " | Línea A: " + a1 + "-" + a2 + 
+                           " | Línea B: " + b1 + "-" + b2);
         return intersect;
     }
 
